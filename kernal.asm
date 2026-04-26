@@ -25,11 +25,11 @@ _syscallStart_:
 #Do init stuff
 _syscall0:
     # Initialization goes here
-    lui $sp, 0x03FF
-    ori $sp, $sp, 0x0000
+    lui $sp, 1023
+    ori $sp, $sp, 0000
     la $k1, _END_OF_STATIC_MEMORY_
 
-    lui $v0, 0x03FF
+    lui $v0, 1023
     sw $k1, 0($v0)
 
     j _syscallEnd_
@@ -37,7 +37,45 @@ _syscall0:
 #Print Integer
 _syscall1:
     # Print Integer code goes here
-    sw $a0, -4096($0)
+    addi $v0, $0, 0
+    addi $sp, $sp, -12
+    sw $t0, 0($sp)
+    sw $t1, 4($sp)
+    sw $t2, 8($sp)
+
+    addi $t2, $0, 0
+    addi $t0, $a0, 0
+
+    bne $t0, $0, syscall1loop
+    addi $t0, $t0, 48
+    sw $t0, -4096($0)
+    j syscall1finish
+
+syscall1loop:
+    beq $t0, $0, syscall1print
+    addi $t1, $0, 10
+    div $t0, $t1
+    addi $t2, $t2, 1
+    mflo $t0
+    mfhi $t1
+    addi $sp, $sp, -4
+    sw $t1, 0($sp)
+    j syscall1loop
+
+syscall1print:
+    beq $t2, $0, syscall1finish
+    addi $t2, $t2, -1
+    lw $t0, 0($sp)
+    addi $sp, $sp, 4
+    addi $t0, $t0, 48
+    sw $t0, -4096($0)
+    j syscall1print
+
+syscall1finish:
+    lw $t0, 0($sp)
+    lw $t1, 4($sp)
+    lw $t2, 8($sp)
+    addi $sp, $sp, 12
 
     jr $k0
 
@@ -53,6 +91,7 @@ _syscall5:
     j syscall5loop
 
 syscall5finish:
+    sw $0, -4080($0)
     lw $t0, 0($sp)
     lw $t1, 4($sp)
     lw $t2, 8($sp)
@@ -61,7 +100,7 @@ syscall5finish:
 
 syscall5loop:
     lw $t0, -4080($0)
-    beq $t0, 0, syscall5loop
+    beq $t0, 0, syscall5finish
     lw $t0, -4076($0)
     addi $t1, $0, 48
     slt $t2, $t0, $t1
@@ -80,10 +119,10 @@ syscall5loop:
 #Heap allocation
 _syscall9:
     # Heap allocation code goes here
-    lui $k1, 0x03FF
+    lui $k1, 1023
     lw $v0, 0($k1)
     add $k1, $v0, $a0
-    lui $t0, 0x03FF
+    lui $t0, 1023
     sw $k1, 0($t0)
     jr $k0
 
