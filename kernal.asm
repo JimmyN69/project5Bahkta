@@ -3,6 +3,7 @@
 #program will conflict
 
 .data
+
 .text
 _syscallStart_:
     beq $v0, $0, _syscall0 #jump to syscall 0
@@ -24,35 +25,85 @@ _syscallStart_:
 #Do init stuff
 _syscall0:
     # Initialization goes here
+    lui $sp, 0x03FF
+    ori $sp, $sp, 0x0000
+    la $k1, _END_OF_STATIC_MEMORY_
+
+    lui $v0, 0x03FF
+    sw $k1, 0($v0)
+
     j _syscallEnd_
 
 #Print Integer
 _syscall1:
     # Print Integer code goes here
+    sw $a0, -4096($0)
+
     jr $k0
 
 #Read Integer
 _syscall5:
     # Read Integer code goes here
+    addi $v0, $0, 0
+    addi $sp, $sp, -12
+    sw $t0, 0($sp)
+    sw $t1, 4($sp)
+    sw $t2, 8($sp)
+
+    j syscall5loop
+
+syscall5finish:
+    lw $t0, 0($sp)
+    lw $t1, 4($sp)
+    lw $t2, 8($sp)
+    addi $sp, $sp, 12
     jr $k0
+
+syscall5loop:
+    lw $t0, -4080($0)
+    beq $t0, 0, syscall5loop
+    lw $t0, -4076($0)
+    addi $t1, $0, 48
+    slt $t2, $t0, $t1
+    bne $t2, $0, syscall5finish
+    addi $t1, $0, 57
+    slt $t2, $t1, $t0
+    bne $t2, $0, syscall5finish
+    sw $0, -4080($0)
+    addi $t0, $t0, -48
+    sll $t1, $v0, 3
+    sll $t2, $v0, 1
+    add $v0, $t1, $t2
+    add $v0, $v0, $t0
+    j syscall5loop
 
 #Heap allocation
 _syscall9:
     # Heap allocation code goes here
+    lui $k1, 0x03FF
+    lw $v0, 0($k1)
+    add $k1, $v0, $a0
+    lui $t0, 0x03FF
+    sw $k1, 0($t0)
     jr $k0
 
 #"End" the program
 _syscall10:
     j _syscall10
 
-#read character
+#print character
 _syscall11:
-    # read character code goes here
+    # print character code goes here
+    sw $a0, -4096($0)
     jr $k0
 
-#print character
+#read character
 _syscall12:
-    # print character code goes here
+    # read character code goes here
+    lw $v0, -4080($0)
+    beq $v0, $0, _syscall12
+    lw $v0, -4076($0)
+    sw $0, -4080($0)
     jr $k0
 
 #extra credit syscalls go here?
