@@ -91,7 +91,6 @@ _syscall5:
     j syscall5loop
 
 syscall5finish:
-    sw $0, -4080($0)
     lw $t0, 0($sp)
     lw $t1, 4($sp)
     lw $t2, 8($sp)
