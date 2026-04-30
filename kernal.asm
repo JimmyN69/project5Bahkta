@@ -19,6 +19,10 @@ _syscallStart_:
     beq $v0, $k1, _syscall11 #jump to syscall 11
     addi $k1, $0, 12
     beq $v0, $k1, _syscall12 #jump to syscall 12
+    addi $k1, $0, 13
+    beq $v0, $k1, _syscallJoystick #jump to syscall joystick
+    addi $k1, $0, 14
+    beq $v0, $k1, _syscallLEDPanel #jump to syscall led
     #Error state - this should never happen - treat it like an end program
     j _syscall10
 
@@ -145,16 +149,11 @@ _syscall12:
     jr $k0
 
 _syscallJoystick:
-    lw  $k1, -4032($0)
-    andi $v0, $k1, 15
-    srl  $v1, $k1, 4 
-    andi $v1, $v1, 15
+    lw  $v0, -4032($0)
     jr $k0
 
 _syscallLEDPanel:
     sw $a0, 0($a1)
     jr $k0
-
-#extra credit syscalls go here?
 
 _syscallEnd_:    
