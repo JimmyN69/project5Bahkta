@@ -144,6 +144,17 @@ _syscall12:
     sw $0, -4080($0)
     jr $k0
 
+_syscallJoystick:
+    lw  $k1, -4032($0)
+    andi $v0, $k1, 15
+    srl  $v1, $k1, 4 
+    andi $v1, $v1, 15
+    jr $k0
+
+_syscallLEDPanel:
+    sw $a0, 0($a1)
+    jr $k0
+
 #extra credit syscalls go here?
 
-_syscallEnd_:
+_syscallEnd_:    
